@@ -1,5 +1,7 @@
 import { Playfair_Display, Inter } from "next/font/google";
-import "./globals.css";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer"
+import "@/app/globals.css";
 
 const playfair = Playfair_Display({
   subsets: ["latin"],
@@ -12,10 +14,10 @@ const inter = Inter({
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
-      <body className={inter.className}>
+      <div className={inter.className}>
+        <Header />
         {children}
-      </body>
-    </html>
+        <Footer />
+      </div>
   );
 }
