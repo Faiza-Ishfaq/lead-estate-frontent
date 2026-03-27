@@ -1,5 +1,6 @@
 "use client";
 
+import { loginUser } from "@/lib/api";
 import { useState } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
@@ -32,11 +33,21 @@ export default function SigninPage() {
   };
 
   // Handle form submit
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (validateForm()) {
-      // Submit form logic here
-      console.log("Form submitted:", formData);
+
+    if (!validateForm()) return;
+
+    const response = await loginUser(formData);
+
+    if ( response.success) {
+      alert("Login Successful!");
+
+      localStorage.setItem("user", JSON.stringify(response.user));
+
+      window.location.href = "/";
+    } else {
+      alert(response.message || "Login failed");
     }
   };
 

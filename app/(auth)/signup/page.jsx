@@ -1,5 +1,6 @@
 "use client";
 
+import { signupUser } from "@/lib/api";
 import { useState } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
@@ -8,28 +9,22 @@ import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
 export default function SignupPage() {
 
   const handleSubmit = async () => {
-    try {
-      const response = await fetch("/api/signup", {
-        method: "POST",
-        headers: { "Content-Type": "application/json"},
-        body: JSON.stringify(formData),
-      });
+    if (!validateStep()) return;
 
-      const data = await response.json();
+    const payload = { ...formData };
+    delete payload.confirmPassword; // backend doesn't need this
+    delete payload.terms; // backend doesn't need terms
 
-      if (response.ok) {
-        console.log("Signup successful:", data);
-        localStorage.setItem("token", data.token);
-        alert("Account created successfully!");
-      } else {
-        alert(data.error || "Signup failed");
-      }
-    } catch (error) {
-        console.error(error);
-        alert("Server error, try again later");
+    const response = await signupUser(payload);
+
+    if (response.success) {
+      alert("Signup Successful!");
+      // Optionally redirect to login page
+      window.location.href = "/signin";
+    } else {
+      alert(response.message || "Signup failed");
     }
   };
-
 
   const [step, setStep] = useState(1);
   const [showPassword, setShowPassword] = useState(false);
