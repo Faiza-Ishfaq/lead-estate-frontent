@@ -1,6 +1,7 @@
 import { Playfair_Display, Inter } from "next/font/google";
 import Header from "@/components/Header";
-import Footer from "@/components/Footer"
+import Footer from "@/components/Footer";
+import { AuthProvider } from "@/context/AuthContext"; 
 import "@/app/globals.css";
 
 const playfair = Playfair_Display({
@@ -14,10 +15,12 @@ const inter = Inter({
 
 export default function RootLayout({ children }) {
   return (
+     <AuthProvider>
       <div className={inter.className}>
         <Header />
         {children}
         <Footer />
       </div>
+    </AuthProvider>
   );
 }

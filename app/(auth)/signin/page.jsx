@@ -43,8 +43,6 @@ export default function SigninPage() {
     if ( response.success) {
       alert("Login Successful!");
 
-      localStorage.setItem("user", JSON.stringify(response.user));
-
       window.location.href = "/";
     } else {
       alert(response.message || "Login failed");

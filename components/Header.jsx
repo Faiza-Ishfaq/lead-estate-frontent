@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Bars3Icon, XMarkIcon, ChevronDownIcon } from "@heroicons/react/24/outline";
+import { Bars3Icon, XMarkIcon, ChevronDownIcon, UserCircleIcon  } from "@heroicons/react/24/outline";
+import { useAuth } from "../context/AuthContext";
 
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -19,6 +20,17 @@ export default function Header() {
       ...prev,
       [menu]: !prev[menu],
     }));
+  };
+
+  const { user, setUser } = useAuth();
+
+  const logout = async () => {
+    await fetch("http://localhost:4000/api/logout", {
+      method: "POST",
+      credentials: "include"
+    });
+
+     setUser(null);
   };
 
   return (
@@ -93,7 +105,7 @@ export default function Header() {
                 <div className="grid grid-cols-2 gap-6">
                   <div>
                     <h4 className="font-semibold mb-3">Selling Options</h4>
-                    <Link href="/sell/post-property" className="block py-1 hover:text-[#C5A059]">Post Property</Link>
+                    <Link href="/post-property" className="block py-1 hover:text-[#C5A059]">Post Property</Link>
                     <Link href="/sell/home-value" className="block py-1 hover:text-[#C5A059]">Home Value</Link>
                     <Link href="/sell/seller-guide" className="block py-1 hover:text-[#C5A059]">Seller Guide</Link>
                   </div>
@@ -144,9 +156,48 @@ export default function Header() {
 
           {/* Desktop Buttons */}
           <div className="hidden lg:flex gap-4">
-            <Link href="/signin" className="hover:text-[#C5A059] mt-3">Sign In</Link>
-            <Link href="/signup" className="px-4 py-2 border border-[#1A2B3C] rounded hover:bg-[#C5A059]">Sign Up</Link>
-            {/* <Link href="/post-property" className="bg-[#C5A059] text-white px-5 py-2 rounded">Post Property</Link> */}
+            { !user ? (
+              <>
+                <Link href="/signin" className="hover:text-[#C5A059] mt-3">Sign In</Link>
+                <Link href="/signup" className="px-4 py-2 border border-[#1A2B3C] rounded hover:bg-[#C5A059]">Sign Up</Link>
+                {/* <Link href="/post-property" className="bg-[#C5A059] text-white px-5 py-2 rounded">Post Property</Link> */}
+              </>
+            ) : (
+              <div className="relative group">
+
+                {/* Profile Icon + Name */}
+                <div className="flex items-center gap-2 cursor-pointer">
+                  <div className="w-9 h-9 bg-[#1A2B3C] text-white flex items-center justify-center rounded-full">
+                    {user.fullName?.charAt(0)}
+                  </div>
+                  <span className="text-sm font-medium">{user.fullName}</span>
+                  <ChevronDownIcon className="w-4 h-4" />
+                </div>
+
+                {/* Dropdown */}
+                <div className="absolute right-0 mt-2 w-48 bg-white border rounded-lg shadow-lg opacity-0 invisible group-hover:visible group-hover:opacity-100 transition p-2 z-50">
+
+                  <Link href="/profile" className="block px-3 py-2 hover:bg-gray-100 rounded">
+                    My Profile
+                  </Link>
+
+                  <Link href="/dashboard" className="block px-3 py-2 hover:bg-gray-100 rounded">
+                    Dashboard
+                  </Link>
+
+                  <Link href="/my-properties" className="block px-3 py-2 hover:bg-gray-100 rounded">
+                    My Properties
+                  </Link>
+
+                  <button
+                    onClick={logout}
+                    className="w-full text-left px-3 py-2 hover:bg-red-100 text-red-500 rounded">
+                    Logout
+                  </button>
+
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -210,7 +261,7 @@ export default function Header() {
                 </button>
                 {mobileDropdowns.sell && (
                   <ul className="pl-4 mt-1 flex flex-col gap-1">
-                    <Link href="/sell/post-property" className="block py-1 px-2 rounded hover:bg-[#C5A059] hover:text-white">Post Property</Link>
+                    <Link href="/post-property" className="block py-1 px-2 rounded hover:bg-[#C5A059] hover:text-white">Post Property</Link>
                     <Link href="/sell/home-value" className="block py-1 px-2 rounded hover:bg-[#C5A059] hover:text-white">Home Value</Link>
                   </ul>
                 )}
@@ -249,11 +300,26 @@ export default function Header() {
               </li>
 
               {/* Sign In / Sign Up / Post */}
-              <li>
-                <Link href="/signin" className="block py-2 px-2 rounded hover:bg-[#C5A059] hover:text-white">Sign In</Link>
-                <Link href="/signup" className="block py-2 px-2 rounded hover:bg-[#C5A059] hover:text-white">Sign Up</Link>
-                {/* <Link href="/post-property" className="block py-2 px-2 rounded hover:bg-[#C5A059] hover:text-white">Post Property</Link> */}
-              </li>
+              { !user ? (
+                <>
+                  <li>
+                    <Link href="/signin" className="block py-2 px-2 rounded hover:bg-[#C5A059] hover:text-white">Sign In</Link>
+                    <Link href="/signup" className="block py-2 px-2 rounded hover:bg-[#C5A059] hover:text-white">Sign Up</Link>
+                    {/* <Link href="/post-property" className="block py-2 px-2 rounded hover:bg-[#C5A059] hover:text-white">Post Property</Link> */}
+                  </li>
+                </>
+              ) : (
+                 <>
+                  <div className="px-2 py-2 font-semibold">{user.fullName}</div>
+
+                  <Link href="/profile" className="block py-2 px-2">Profile</Link>
+                  <Link href="/dashboard" className="block py-2 px-2">Dashboard</Link>
+
+                  <button onClick={logout} className="block py-2 px-2 text-red-500">
+                    Logout
+                  </button>
+                </>
+              )}
 
             </ul>
           </div>
